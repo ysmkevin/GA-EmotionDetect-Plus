@@ -3,15 +3,29 @@ package simpleGa;
 public class Individual {
 
     static int defaultGeneLength = 64;
-    private byte[] genes = new byte[defaultGeneLength];
+    private double[] genes = new double[3];
+    private double tfGene;
+    private double idfGene;
+    private double divGene;
     // Cache
-    private int fitness = 0;
+    private double fitness = 0;
 
     // Create a random individual
     public void generateIndividual() {
         for (int i = 0; i < size(); i++) {
-            byte gene = (byte) Math.round(Math.random());
-            genes[i] = gene;
+            
+            double tfGene = (double) Math.round(Math.random());
+            double idfGene = (double) Math.round(Math.random());
+            double divGene = (double) Math.round(Math.random());
+            System.out.println("GENE NUMBER ===== "+i);
+            
+            genes[0]=tfGene;
+            genes[1]=idfGene;
+            genes[2]=divGene;
+            
+            System.out.println("tf "+genes[0]);
+            System.out.println("idf "+genes[1]);
+            System.out.println("div "+genes[2]);
         }
     }
 
@@ -21,11 +35,11 @@ public class Individual {
         defaultGeneLength = length;
     }
     
-    public byte getGene(int index) {
+    public double getGene(int index) {
         return genes[index];
     }
 
-    public void setGene(int index, byte value) {
+    public void setGene(int index, double value) {
         genes[index] = value;
         fitness = 0;
     }
@@ -35,7 +49,7 @@ public class Individual {
         return genes.length;
     }
 
-    public int getFitness() {
+    public double getFitness() {
         if (fitness == 0) {
             fitness = FitnessCalc.getFitness(this);
         }

@@ -10,10 +10,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -114,9 +116,20 @@ public class PFICFRankClassifier {
 
             }
 
+            File out = new File("C:\\Users\\Kevin\\Documents\\Resultz\\weights");
+            FileWriter w = new FileWriter(out,true);
+            w.write("Accuracy: " + ((double) right / (double) count)+"\n");
+            w.close();
+            
             System.out.println("Classified: " + count);
             System.out.println("Correct: " + right);
             System.out.println("Accuracy: " + ((double) right / (double) count));
+            
+            //reset back the counter for next classification
+            right=0;
+            count=0;
+            
+            
 
         } catch (FileNotFoundException ex) {
             Logger.getLogger(PFICFRankClassifier.class.getName()).log(Level.SEVERE, null, ex);
@@ -155,16 +168,7 @@ public class PFICFRankClassifier {
         BufferedReader br;
         // for patterns
         if (type == 1) {
-            //  File folder = new File("C:\\Users\\Carlos\\Dropbox\\workspace\\filter2\\hadoop\\SentiLingua\\french\\french1\\output\\tficf\\patterns\\unic\\25");
-            // File folder = new File("C:\\Users\\Carlos\\Dropbox\\workspace\\filter2\\hadoop\\SentiLingua\\spanish\\spanish2\\output\\tficf\\patterns\\unic\\9");
-            
-
             File folder = new File("C:\\Users\\Kevin\\Documents\\Codes IDEA\\KEVIN AFTER AMERICA\\Genetic Algo\\6 emotions tficf weighted");
-            // folder = new File("C:\\Users\\Kevin\\Documents\\Codes IDEA\\REFERENCE ORIGINAL CODE\\patterns\\6emos");
-            //File folder = new File("C:\\Users\\Kevin\\Documents\\Codes IDEA\\KEVIN AFTER AMERICA\\Genetic Algo\\6 emotions tficf ORIGINAL CARLOS");
-            
-            // File folder = new File("C:\\Users\\Carlos\\Dropbox\\workspace\\filter2\\hadoop\\SentiLingua\\english\\english1\\output\\tficf\\patterns\\unic_many\\mix\\5\\");
-            // File folder = new File("C:\\Users\\Carlos\\Dropbox\\workspace\\weka experiments\\datasets\\training\\english\\6 classes\\patterns\\final\\87\\");
             for (final File fileEntry : folder.listFiles()) {
                 //If it is not a directory, hence is a file
                 if (!fileEntry.isDirectory()) {
@@ -225,9 +229,11 @@ public class PFICFRankClassifier {
                         }
                         once = true;
                         if (finalScore != Double.NEGATIVE_INFINITY && finalScore != Double.POSITIVE_INFINITY) {
-                            //System.out.println("Score for "+ fileEntry.getName().split("_")[1]+" "+finalScore);
+                            System.out.println("Score for "+ fileEntry.getName().split("_")[1]+" "+finalScore);
                             temp.put(fileEntry.getName().split("_")[1], finalScore);
                             //classi.put(finalScore, fileEntry.getName().split("_")[1]);
+                            
+                            
                         } else {
                             break;
                         }
@@ -367,23 +373,34 @@ public class PFICFRankClassifier {
         return sortedEntries;
     }
 
-    public static void printStats() {
+    public static void printStats() throws FileNotFoundException, IOException {
         Iterator<ClassStats> itEmo = stats.values().iterator();
         System.out.println("\n\n");
+        
+        File out = new File("C:\\Users\\Kevin\\Documents\\Resultz\\weights");
+        FileWriter fw = new FileWriter(out,true);
         while (itEmo.hasNext()) {
             ClassStats cs = itEmo.next();
-            System.out.println(cs.getName() + "\t" + (double) cs.getCorrect() / (double) cs.getCount());
-            
+            //System.out.println(cs.getName() + "\t" + (double) cs.getCorrect() / (double) cs.getCount());
+            fw.append("\n"+cs.getName() + "\t\n" + (double) cs.getCorrect() / (double) cs.getCount());
+            System.out.println("Saved in "+out);
         }
+        fw.write("\n");
+        fw.close();
     }
 
 
     public static void main(String[] args) throws FileNotFoundException, UnsupportedEncodingException, IOException {
 
        // THe file to classify
-        File file = new File("C:\\Users\\Kevin\\Documents\\Codes IDEA\\KEVIN AFTER AMERICA\\Carlos\\annotated\\soccer\\carlos");
-
+        //File file = new File("C:\\Users\\Kevin\\Documents\\annotated\\mixed");
+        
+        //File file = new File("C:\\Users\\Kevin\\Documents\\annotated\\products\\carlos");
+        
+        File file = new File("C:\\Users\\Kevin\\Documents\\annotated\\soccer\\carlos");
+        
         fstream = new FileOutputStream(file + "_sentiment");
+        
 
         out = new BufferedWriter(new OutputStreamWriter(fstream, "UTF8"));
           

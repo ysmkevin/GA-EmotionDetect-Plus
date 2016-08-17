@@ -2,18 +2,18 @@ package simpleGa;
 
 public class FitnessCalc {
 
-    static byte[] solution = new byte[64];
+    static double[] solution = new double[64];
 
     /* Public methods */
     // Set a candidate solution as a byte array
-    public static void setSolution(byte[] newSolution) {
+    public static void setSolution(double[] newSolution) {
         solution = newSolution;
     }
 
     // To make it easier we can use this method to set our candidate solution 
     // with string of 0s and 1s
     static void setSolution(String newSolution) {
-        solution = new byte[newSolution.length()];
+        solution = new double[newSolution.length()];
         // Loop through each character of our string and save it in our byte 
         // array
         for (int i = 0; i < newSolution.length(); i++) {

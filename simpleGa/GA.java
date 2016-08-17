@@ -8,7 +8,7 @@ public class GA {
         FitnessCalc.setSolution("English");
 
         // Create an initial population
-        Population myPop = new Population(2, true);
+        Population myPop = new Population(1, true);
         
         // Evolve our population until we reach an optimum solution
         int generationCount = 0;

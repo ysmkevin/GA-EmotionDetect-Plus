@@ -4,13 +4,14 @@
  */
 package filter3;
 
-
+import simpleclassifier.PFICFRankClassifier.*;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
@@ -31,7 +32,8 @@ import org.jgap.*;
 import org.jgap.impl.*;
 
 public class TFICF {
-
+    
+    private static FileOutputStream fstream;
     public static void main(String[] args) throws FileNotFoundException, IOException, InvalidConfigurationException {
 
         String lang = "english";
@@ -47,11 +49,9 @@ public class TFICF {
 
         TreeMap<String, TreeMap<String, Double>> tf;
         System.out.println("Running TF ...");
-        //tf = tf("C:\\Users\\Carlos\\Dropbox\\workspace\\TweetsDatasets\\crawler_project\\english\\English_old\\htend\\6 classes\\patterns\\pmi\\pmi2");
-        //tf = tf("C:\\Users\\Carlos\\Dropbox\\workspace\\TweetsDatasets\\crawler_project\\english\\English_old\\htend\\6 classes\\"+type+"\\unic\\2\\5");
-        //tf = tf("C:\\Users\\Carlos\\Dropbox\\workspace\\TweetsDatasets\\crawler_project\\english\\jammin\\patterns\\5_dyn_20150216");
-        //tf = tf("C:\\Users\\Kevin\\Documents\\Codes IDEA\\KEVIN AFTER AMERICA\\DATASET\\english\\English_old\\htend\\6 classes\\patterns\\pmi\\pmi2",true);
-        tf = tf("C:\\Users\\Kevin\\Documents\\Codes IDEA\\KEVIN AFTER AMERICA\\Carlos\\patterns\\6emos",true);
+        tf = tf("C:\\Users\\Kevin\\Documents\\Codes IDEA\\KEVIN AFTER AMERICA\\DATASET\\english\\English_old\\htend\\6 classes\\patterns\\pmi\\pmi2",true);
+        //tf = tf("C:\\Users\\Kevin\\Documents\\Codes IDEA\\KEVIN AFTER AMERICA\\Carlos\\patterns\\6emos",true);
+       
 
         //tf = tf("C:\\Users\\Carlos\\Dropbox\\workspace\\TweetsDatasets\\crawler_project\\indonesian\\jammin\\patterns\\5");
         //tf = tf("C:\\Users\\Carlos\\Dropbox\\workspace\\filter2\\hadoop\\SentiLingua\\english\\english1\\output\\frequencies");
@@ -88,22 +88,26 @@ public class TFICF {
         double icfTres;
         double divTres;
         
-        tfTres = randomWithRange(0.0,1.0);
-        icfTres = randomWithRange(1.14,1.99);
-        divTres = randomWithRange(0.0,1.0);
+        tfTres = randomWithRange(0.2,1.0);
+        icfTres = randomWithRange(1.44,1.99);
+        divTres = randomWithRange(0.3,1.0);
         
         double weight1=tfTres;
         double weight2=icfTres;
         double weight3=divTres;
         
+        weight1=1;weight2=1;weight3=1;
         
-        System.out.println(tfTres);
-        System.out.println(icfTres);
-        System.out.println(divTres);
-        ///run normal
-        //tficf = tficf(tf, icf, score3, typeCode);
-        //print(tficf, "C:\\Users\\Kevin\\Documents\\Codes IDEA\\KEVIN AFTER AMERICA\\Genetic Algo\\6 emotions tficf ORIGINAL CARLOS\\tficf_");
         
+        System.out.println(weight1);
+        System.out.println(weight2);
+        System.out.println(weight3);
+        
+        File out = new File("C:\\Users\\Kevin\\Documents\\Resultz\\weights");
+        FileWriter fw = new FileWriter(out,true);
+        fw.append("\n"+weight1+" "+weight2+" "+weight3+"\n");
+        fw.close();
+
         System.out.println("Then run weighted\n");
         ///run weighted
         tficf_weighted = tficf_weighted(tf,icf,score3,typeCode,weight1,weight2,weight3);
@@ -119,6 +123,13 @@ public class TFICF {
         ///select the best one
         ///the best one can use to do testing data
         ///extra for good visual : detailed info for converged and normal ones 
+        
+        File ClassifierFile = new File("C:\\Users\\Kevin\\Documents\\annotated\\political\\carlos");
+        
+       
+        
+        
+        
         
     }
     
@@ -311,57 +322,6 @@ public class TFICF {
 
         return patts;
     }
-
-    public static TreeMap<String, TreeMap<String, Double>> tficf(TreeMap<String, TreeMap<String, Double>> tf, TreeMap<String, Double> icf, TreeMap<String, Double> score3, int type) throws FileNotFoundException, IOException {
-        TreeMap<String, TreeMap<String, Double>> tfidf = new TreeMap(tf);
-        Iterator<String> it = tfidf.keySet().iterator();
-        int c = 0;
-        
-        File weight_res = new File("C:\\Users\\Kevin\\Documents\\Codes IDEA\\KEVIN AFTER AMERICA\\Genetic Algo\\weighted experiment\\weight");
-        FileOutputStream is = new FileOutputStream(weight_res);
-        OutputStreamWriter write = new OutputStreamWriter(is);    
-        Writer w = new BufferedWriter(write);
-        //w.write("TF\tIDF\tDiv\tTotal\n");
-        
-        Double Total;
-        TreeMap<String,String> notFound = new TreeMap();
-        while (it.hasNext()) {
-            String emotion = it.next();
-            TreeMap<String, Double> tfidfEmo = tfidf.get(emotion);
-            Iterator<String> itTF = tfidfEmo.keySet().iterator();
-            while (itTF.hasNext()) {
-                String patt = itTF.next();
-                // if (score3.containsKey(patt.trim())) {
-                if (type == 1) {
-                    if (score3.get(patt.trim()) == null) {
-                        System.out.println("Cannot find " + patt);
-                        notFound.put(patt, patt);
-                    } else {
-                        
-                        Total=Math.pow(tfidfEmo.get(patt),2)* Math.pow(icf.get(patt),3 )* Math.pow(score3.get(patt.trim()),0.5);
-                        w.write(tfidfEmo.get(patt) +"\t"+ icf.get(patt)+"\t"+ score3.get(patt.trim())+"\t"+tfidfEmo.get(patt) * icf.get(patt) * score3.get(patt.trim())+"\n");
-                        //w.write(Math.pow(tfidfEmo.get(patt),2)+"\t"+ Math.pow(icf.get(patt),3)+"\t"+ Math.pow(score3.get(patt.trim()),0.5)+"\t" +Total+"\n\n");
-                        /*
-                        System.out.println("+====================================================================================+");
-                        System.out.println("ORIGINAL TF value : "+ tfidfEmo.get(patt) +" IDF : "+ icf.get(patt)+" div : "+ score3.get(patt.trim()));
-                        System.out.println("Here for test : TF value : "+ Math.pow(tfidfEmo.get(patt),2)+" IDF : "+ Math.pow(icf.get(patt),3)+" div : "+ Math.pow(score3.get(patt.trim()),0.5));
-                        System.out.println("total :"+tfidfEmo.get(patt) * icf.get(patt) * score3.get(patt.trim()));
-                        System.out.println("+====================================================================================+");
-                        */
-                        tfidfEmo.put(patt, tfidfEmo.get(patt) * icf.get(patt) * score3.get(patt.trim()));
-                    }
-                } else {
-                    tfidfEmo.put(patt, tfidfEmo.get(patt) * icf.get(patt));
-                }
-                /* } // tfidfEmo.put(patt, icf.get(patt));
-                 else {
-                 System.out.println(patt + " not found in score3");
-                 }*/
-            }
-        }
-        System.out.println("Could not find patterns: "+notFound.size()+" patterns.");
-        return tfidf;
-    }
     
     public static TreeMap<String, TreeMap<String, Double>> tficf_weighted (TreeMap<String, TreeMap<String, Double>> tf, TreeMap<String, Double> icf, TreeMap<String, Double> score3, int type, double  weight1, double weight2, double weight3) throws FileNotFoundException, IOException {
         TreeMap<String, TreeMap<String, Double>> tfidf_weight = new TreeMap(tf);
@@ -390,11 +350,13 @@ public class TFICF {
                     } else {
                         Original=(tfidfEmo.get(patt)*icf.get(patt)*score3.get(patt));
                         Total= (Math.pow(tfidfEmo.get(patt),weight1)) * (Math.pow(icf.get(patt),weight2)) * (Math.pow(score3.get(patt.trim()),weight3));
+                        //Total= (Math.pow(tfidfEmo.get(patt),weight1)) * (Math.pow(icf.get(patt),weight2) * 0.4);
                         w.write(tfidfEmo.get(patt) +"\t"+ icf.get(patt)+"\t"+ score3.get(patt.trim())+"\t"+tfidfEmo.get(patt) * icf.get(patt) * score3.get(patt.trim())+"\n");
+                        //w.write(tfidfEmo.get(patt) +"\t"+ icf.get(patt)+"\t"+ score3.get(patt.trim())+"\t"+tfidfEmo.get(patt) * icf.get(patt)* 0.4+"\n");
+                        //System.out.println(Original+"origin and total of "+Total);
+                        
                         tfidfEmo.put(patt, Total);
-                        //System.out.println("tficf_origin   "+Original);
                     }
-                    // tfidfEmo.put(patt, tfidfEmo.get(patt) * icf.get(patt));
                 } else {
                     tfidfEmo.put(patt, tfidfEmo.get(patt) * icf.get(patt));
                 }
@@ -451,7 +413,7 @@ public class TFICF {
                 String line;
                 for (Map.Entry<String, Double> entry : entriesSortedByValues(tfidfEmo)) {
                     line = entry.getKey() + "\t" + entry.getValue();
-                    //System.out.println(line);
+                    System.out.println(line);
                     out.write(line);
                     out.newLine();
                 }

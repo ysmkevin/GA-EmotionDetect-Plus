@@ -17,6 +17,7 @@ public class Population {
                 Individual newIndividual = new Individual();
                 newIndividual.generateIndividual();
                 saveIndividual(i, newIndividual);
+                System.out.println("Create Population");
             }
         }
     }
